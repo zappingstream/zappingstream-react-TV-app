@@ -9,6 +9,7 @@ interface TVPlayerProps {
 export const TVPlayer = ({ videoId, onClose }: TVPlayerProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const onCloseRef = useRef(onClose);
+    const isClosing = useRef(false);
 
     // Mantenemos la referencia de onClose actualizada sin reiniciar el effect principal
     useEffect(() => {
@@ -18,26 +19,38 @@ export const TVPlayer = ({ videoId, onClose }: TVPlayerProps) => {
     useEffect(() => {
         containerRef.current?.focus();
 
-        // Capturar el botón "Atrás" físico (Hardware Back Button) de Android TV/Smart TV
-        // Empujamos un estado falso en el historial al abrir el reproductor
-        window.history.pushState({ tvPlayerOpen: true }, '');
+        // Usar un hash (#) fuerza al WebView de Android a crear un paso real en el historial nativo.
+        // pushState con URL vacía suele ser ignorado por el botón "Atrás" físico en las APKs.
+        window.location.hash = 'player';
 
-        const handlePopState = () => {
-            // Al presionar el botón "Atrás" físico del control, el sistema vuelve atrás en el historial y se dispara este evento
-            onCloseRef.current();
+        const handleHashChange = () => {
+            // Si el hash ya no es '#player', significa que el usuario retrocedió con el control
+            if (window.location.hash !== '#player') {
+                isClosing.current = true;
+                onCloseRef.current();
+            }
         };
 
-        window.addEventListener('popstate', handlePopState);
+        window.addEventListener('hashchange', handleHashChange);
 
         return () => {
-            window.removeEventListener('popstate', handlePopState);
+            window.removeEventListener('hashchange', handleHashChange);
+            // Si el componente se desmonta de otra manera, limpiamos el hash
+            if (window.location.hash === '#player') {
+                window.history.back();
+            }
         };
     }, []);
 
     const handleManualClose = () => {
-        // Si cerramos presionando el botón "Atrás / Esc" de la UI (con OK/Enter) o la tecla Escape del teclado
-        // forzamos el retroceso manual para limpiar el historial, lo cual dispara popstate y cierra todo.
-        window.history.back();
+        if (isClosing.current) return;
+        isClosing.current = true;
+        
+        if (window.location.hash === '#player') {
+            window.history.back(); // Esto dispara hashchange y cierra orgánicamente
+        } else {
+            onCloseRef.current();
+        }
     };
 
     return (
@@ -47,6 +60,7 @@ export const TVPlayer = ({ videoId, onClose }: TVPlayerProps) => {
             tabIndex={0} 
             onKeyDown={(e) => {
                 if (e.key === 'Escape' || e.key === 'Backspace') {
+                    e.preventDefault(); // Evita que Android TV haga doble retroceso accidental
                     handleManualClose();
                 }
             }}
