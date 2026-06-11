@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './TVPlayer.css';
 
 interface TVPlayerProps {
@@ -10,6 +10,20 @@ export const TVPlayer = ({ videoId, onClose }: TVPlayerProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const onCloseRef = useRef(onClose);
     const isClosing = useRef(false);
+    const [showControls, setShowControls] = useState(true);
+    const timerRef = useRef<number | null>(null);
+
+    // Función para despertar el botón y ocultarlo tras 4 segundos
+    const wakeUpControls = () => {
+        setShowControls(true);
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = window.setTimeout(() => setShowControls(false), 4000);
+    };
+
+    useEffect(() => {
+        wakeUpControls();
+        return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+    }, []);
 
     // Mantenemos la referencia de onClose actualizada sin reiniciar el effect principal
     useEffect(() => {
@@ -59,18 +73,25 @@ export const TVPlayer = ({ videoId, onClose }: TVPlayerProps) => {
             ref={containerRef} 
             tabIndex={0} 
             onKeyDown={(e) => {
+                wakeUpControls();
                 if (e.key === 'Escape' || e.key === 'Backspace') {
                     e.preventDefault(); // Evita que Android TV haga doble retroceso accidental
                     handleManualClose();
                 }
             }}
+            onMouseMove={wakeUpControls}
         >
-            <button className="tv-close-btn" onClick={handleManualClose} autoFocus>
+            <button 
+                className="tv-close-btn" 
+                onClick={handleManualClose} 
+                autoFocus
+                style={{ opacity: showControls ? 1 : 0, transition: 'opacity 0.5s ease', pointerEvents: showControls ? 'auto' : 'none' }}
+            >
                 Atrás / Esc para salir
             </button>
             <iframe
                 className="tv-iframe"
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=1&fs=1&modestbranding=1&rel=0`}
+                src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&fs=1&modestbranding=1&rel=0`}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
