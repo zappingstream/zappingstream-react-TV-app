@@ -15,18 +15,19 @@ export default class TVPlayer extends Lightning.Component {
                 y: 60,
                 alpha: 1,
                 rect: true,
-                color: 0xb3000000, // Fondo negro semi-transparente
-                w: 360,
+                color: 0xff38b6ff, // Color celeste activo simulando que está "enfocado"
+                shader: { type: Lightning.shaders.RoundedRectangle, radius: 8 },
+                w: 420,
                 h: 60,
                 Text: {
                     mount: 0.5,
-                    x: 180,
+                    x: 210,
                     y: 30,
                     text: {
-                        text: 'Atrás / Esc para salir',
+                        text: '‹ Presiona OK para salir',
                         fontSize: 24,
-                        fontFace: 'Regular',
-                        textColor: 0xffffffff,
+                        fontFace: 'Bold',
+                        textColor: 0xff000000,
                     }
                 }
             }
@@ -126,6 +127,7 @@ export default class TVPlayer extends Lightning.Component {
             this.tag('Controls').patch({
                 smooth: { alpha: 0 } // Desvanecimiento suave en Lightning
             });
+            this._timer = null; // Limpiamos la referencia para saber que está oculto
         }, 4000);
     }
 
@@ -145,6 +147,16 @@ export default class TVPlayer extends Lightning.Component {
             this._onCloseCallback();
         }
         
+        return true;
+    }
+
+    // Interceptamos el botón OK/Enter del control remoto
+    _handleEnter() {
+        if (this._timer !== null) {
+            this._handleBack(); // Si el botón está visible (timer activo) cerramos el video
+        } else {
+            this._wakeUpControls(); // Si estaba oculto, lo despertamos para que el usuario lo vea
+        }
         return true;
     }
 
