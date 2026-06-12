@@ -33,10 +33,12 @@ export default function () {
   }
 
   // 1. TRAMPA CAPACITOR (ANDROID TV) - ¡El que evita que la app se cierre nativamente!
-  if (window.Capacitor && window.Capacitor.isNativePlatform() && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
-    window.Capacitor.Plugins.App.addListener('backButton', () => {
-      fireGoBack()
-    })
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    // Usamos import dinámico para no romper Rollup/Lightning (evita el error app$1 is not defined)
+    // Esto inicializa el plugin correctamente y secuestra el botón Atrás de Android OS.
+    import('@capacitor/app').then(({ App: CapApp }) => {
+      CapApp.addListener('backButton', () => fireGoBack())
+    }).catch(err => console.error('Error cargando Capacitor App', err))
   }
 
   // 2. TRAMPA TIZEN (SAMSUNG TV)
