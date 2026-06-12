@@ -1,4 +1,4 @@
-name: Compilar App Android (Lightning JS)
+name: Compilar App Android (100% en la Nube)
 
 on:
   workflow_dispatch:
@@ -16,13 +16,12 @@ jobs:
         with:
           node-version: '22'
 
-      - name: 3. Instalar dependencias
+      - name: 3. Instalar dependencias base
         run: npm install
 
-      - name: 4. Compilar Lightning JS
-        # En proyectos Lightning, la compilación estándar se hace a través de su CLI.
-        # Si lo tienes mapeado en tus scripts, 'npm run build' ejecutará 'lng build'.
-        run: npm run build
+      - name: 4. Compilar Lightning JS al vuelo
+        # Usa npx para descargar el CLI temporalmente y compilar
+        run: npx @lightningjs/cli build
 
       - name: 5. Configurar Java JDK
         uses: actions/setup-java@v3
@@ -30,16 +29,27 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
 
-      - name: 6. Sincronizar Capacitor
-        run: npx cap sync android
+      - name: 6. Instalar herramientas de Capacitor en el servidor
+        # Instala el puente nativo solo en este entorno de ejecución
+        run: npm install @capacitor/cli @capacitor/android
 
-      - name: 7. Compilar el APK con Gradle
+      - name: 7. Inicializar y crear plataforma Android
+        # Genera la configuración y la carpeta 'android' temporal
+        run: |
+          if [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.ts ]; then
+            # Si no existe el config, lo crea apuntando a la carpeta de Lightning (usualmente 'dist' o 'build')
+            npx cap init ZappingApp com.zapping.app --web-dir build
+          fi
+          npx cap add android
+          npx cap sync android
+
+      - name: 8. Compilar el APK con Gradle
         working-directory: ./android
         run: |
           chmod +x ./gradlew
           ./gradlew assembleDebug
 
-      - name: 8. Subir el APK final
+      - name: 9. Subir el APK final
         uses: actions/upload-artifact@v4
         with:
           name: zapping-app-debug
