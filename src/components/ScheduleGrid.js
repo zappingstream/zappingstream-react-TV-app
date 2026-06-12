@@ -165,18 +165,18 @@ class EpgRow extends Lightning.Component {
         return {
             w: 1920, h: 280, // Altura fija de la fila
             Sidebar: {
-                w: 100, h: 260, rect: true, color: COLORS.BG_BLACK,
-                Logo: { x: 10, y: 15, w: COMPONENT_SIZE.LOGO_SMALL, h: COMPONENT_SIZE.LOGO_SMALL, shader: { type: Lightning.shaders.RoundedRectangle, radius: BORDER_RADIUS.CIRCLE } },
-                Name: { x: 10, y: 70, w: 80, text: { text: '', fontSize: TYPOGRAPHY.FONT_SIZE_SMALL, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.ACCENT_BLUE, wordWrapWidth: 80, maxLines: 2, textAlign: 'center' } },
+                w: 140, h: 260, rect: true, color: COLORS.BG_BLACK,
+                Logo: { x: 30, y: 15, w: COMPONENT_SIZE.LOGO_MEDIUM, h: COMPONENT_SIZE.LOGO_MEDIUM, shader: { type: Lightning.shaders.RoundedRectangle, radius: BORDER_RADIUS.CIRCLE } },
+                Name: { x: 10, y: 105, w: 120, text: { text: '', fontSize: TYPOGRAPHY.FONT_SIZE_SMALL, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.ACCENT_BLUE, wordWrapWidth: 120, maxLines: 2, textAlign: 'center' } },
                 InfoBtn: {
-                    x: 10, y: 170, w: 80, h: COMPONENT_SIZE.BUTTON_HEIGHT_SMALL, rect: true, color: COLORS.BG_PANEL, shader: { type: Lightning.shaders.RoundedRectangle, radius: BORDER_RADIUS.PILL },
+                    x: 30, y: 180, w: 80, h: COMPONENT_SIZE.BUTTON_HEIGHT_SMALL, rect: true, color: COLORS.BG_PANEL, shader: { type: Lightning.shaders.RoundedRectangle, radius: BORDER_RADIUS.PILL },
                     Label: { mount: 0.5, x: 40, y: COMPONENT_SIZE.BUTTON_HEIGHT_SMALL / 2, text: { text: 'Info', fontSize: TYPOGRAPHY.FONT_SIZE_SMALL, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.TEXT_WHITE } }
                 }
             },
             // Slider horizontal de videos
             TrackBounds: {
-                x: 115, y: 0, w: 1805, h: 280, clipping: true,
-                Slider: { x: 0, y: 0, Items: {} }
+                x: 160, y: -10, w: 1760, h: 300, clipping: true,
+                Slider: { x: 0, y: 10, Items: {} }
             }
         };
     }
@@ -251,7 +251,7 @@ class EpgRow extends Lightning.Component {
             const evIndex = this._index - 1;
             let targetX = 0;
             if (evIndex > 0) {
-                targetX = -(evIndex * 295) + 100; // Desplazar dejando un poco de margen visual (con gap de 15px)
+                targetX = -(evIndex * 280) + 60; // Desplazar exacto dejando 60px de margen respecto a la columna
             }
 
             if (instant) {

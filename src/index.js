@@ -1,7 +1,12 @@
 import { Launch } from '@lightningjs/sdk'
 import App from './App.js'
 
-export default function () {
+export default function (appSettings = {}, platformSettings = {}, appData) {
+  // Ocultar etiqueta celeste de APP y SDK (Inspector de Lightning)
+  appSettings.debug = false
+  appSettings.showVersion = false
+  platformSettings.inspector = false
+
   // --- AJUSTE UNIVERSAL PARA CUALQUIER SMART TV ---
   // Inyectamos CSS global para garantizar que el canvas de Lightning
   // se adapte siempre al 100% de la pantalla sin importar el SO 
@@ -58,5 +63,5 @@ export default function () {
     fireGoBack()
   })
 
-  return Launch(App, ...arguments)
+  return Launch(App, appSettings, platformSettings, appData)
 }

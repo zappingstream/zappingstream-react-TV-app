@@ -9,7 +9,7 @@ export default class ChannelCard extends Lightning.Component {
             h: 300,
             rect: true,
             color: 0xff1a1a1a, // bg-dark
-            shader: { type: Lightning.shaders.RoundedRectangle, radius: 15, stroke: 2, strokeColor: 0xff38b6ff }, // border: 2px solid var(--accent-blue)
+            shader: { type: Lightning.shaders.RoundedRectangle, radius: 15, stroke: 0, strokeColor: 0x00000000 },
             clipping: true,
 
             // Cabecera: Logo y Título
@@ -20,14 +20,14 @@ export default class ChannelCard extends Lightning.Component {
                 Logo: {
                     w: 32, h: 32,
                     alpha: 0, // Se muestra solo si hay imagen
-                    shader: { type: Lightning.shaders.RoundedRectangle, radius: 16, stroke: 1, strokeColor: 0xff38b6ff }
+                    shader: { type: Lightning.shaders.RoundedRectangle, radius: 16 }
                 },
                 Title: {
                     x: 42, y: 4,
                     text: {
                         text: '',
                         fontSize: 22,
-                        fontFace: 'Bold',
+                        fontFace: 'Regular',
                         textColor: 0xffffffff,
                         wordWrapWidth: 160,
                         maxLines: 1,
@@ -37,8 +37,8 @@ export default class ChannelCard extends Lightning.Component {
                 InfoBtn: {
                     x: 220, y: 0, w: 60, h: 32,
                     rect: true, color: 0x00000000,
-                    shader: { type: Lightning.shaders.RoundedRectangle, radius: 8, stroke: 1, strokeColor: 0xff38b6ff },
-                    Text: { mount: 0.5, x: 30, y: 17, text: { text: 'Info', fontSize: 16, fontFace: 'Regular', textColor: 0xff38b6ff } }
+                    shader: { type: Lightning.shaders.RoundedRectangle, radius: 8, stroke: 1, strokeColor: 0xff888888 },
+                    Text: { mount: 0.5, x: 30, y: 17, text: { text: 'Info', fontSize: 16, fontFace: 'Regular', textColor: 0xff888888 } }
                 }
             },
 
@@ -60,28 +60,6 @@ export default class ChannelCard extends Lightning.Component {
                 Desc: {
                     y: 225,
                     text: { text: '', fontSize: 18, textColor: 0xffdddddd, fontFace: 'Regular', wordWrapWidth: 410, maxLines: 10, lineHeight: 26 }
-                }
-            },
-
-            // Pie de página: Última actividad
-            Footer: {
-                y: 250, // Se ajustará dinámicamente según la altura
-                x: 160,
-                mountX: 0.5,
-                alpha: 1,
-                Bg: {
-                    mountX: 0.5, x: 0, y: 0,
-                    rect: true, color: 0xff222222, // var(--bg-panel)
-                    shader: { type: Lightning.shaders.RoundedRectangle, radius: 6, stroke: 1, strokeColor: 0xff333333 },
-                    w: 200, h: 30
-                },
-                Text: {
-                    mount: 0.5, x: 0, y: 16,
-
-                    text: '',
-                    fontSize: 16,
-                    fontFace: 'Regular',
-                    textColor: 0xffaaaaaa
                 }
             }
         };
@@ -140,7 +118,6 @@ export default class ChannelCard extends Lightning.Component {
 
         this.tag('Header').w = targetWidth - 40;
         this.tag('Header.InfoBtn').x = targetWidth - 40 - 60;
-        this.tag('Footer').x = targetWidth / 2;
 
         // --- Render Header ---
         const showMiniLogo = channel.ChannelImgUrl && (isExpanded || (isLiveGroup && mainActive));
@@ -149,9 +126,11 @@ export default class ChannelCard extends Lightning.Component {
             alpha: showMiniLogo ? 1 : 0
         });
         this.tag('Header.Title').patch({
-            text: { text: channel.ChannelName },
-            x: showMiniLogo ? 45 : 0, // Empujamos el texto si hay logo
-            text: { wordWrapWidth: targetWidth - 40 - 60 - (showMiniLogo ? 55 : 10) }
+            x: showMiniLogo ? 45 : 0,
+            text: { 
+                text: channel.ChannelName + ' ',
+                wordWrapWidth: targetWidth - 40 - 60 - (showMiniLogo ? 55 : 10)
+            }
         });
         this.tag('Header.InfoBtn.Text').text.text = isExpanded ? 'Ocultar' : 'Info';
 
@@ -220,12 +199,6 @@ export default class ChannelCard extends Lightning.Component {
         }
 
         this.tag('Body').children = bodyItems;
-
-        // --- Render Footer ---
-        this.tag('Footer').y = targetHeight - 40; // Posición al fondo
-        const footerText = formatActivityDate ? formatActivityDate(channel.LastActivityAt) : channel.LastActivityAt;
-        this.tag('Footer.Text').text.text = footerText;
-        this.tag('Footer.Bg').w = footerText.length * 8 + 30;
     }
 
     // Equivalente a `setFailedVideos(prev => new Set(prev).add(id))`
@@ -241,13 +214,9 @@ export default class ChannelCard extends Lightning.Component {
         // Animación al enfocar la tarjeta (agrandado suave y resaltado de borde exagerado en TV)
         this.patch({
             smooth: { scale: 1.05 },
-            color: 0xff333333, // background-color: #333
-            shader: { type: Lightning.shaders.RoundedRectangle, radius: 15, stroke: 8, strokeColor: 0xff38b6ff }, // outline: 8px solid var(--accent-blue)
+            color: 0xff2a2a2a, // background-color un poquito más claro
+            shader: { type: Lightning.shaders.RoundedRectangle, radius: 15, stroke: 4, strokeColor: 0xff38b6ff }, // Borde celeste 4px
             zIndex: 10
-        });
-        this.tag('Header.InfoBtn').patch({
-            color: 0xff38b6ff, // background-color: var(--accent-blue)
-            Text: { text: { textColor: 0xff1a1a1a } } // color: var(--bg-black)
         });
     }
 
@@ -255,12 +224,8 @@ export default class ChannelCard extends Lightning.Component {
         this.patch({
             smooth: { scale: 1.0 },
             color: 0xff1a1a1a,
-            shader: { type: Lightning.shaders.RoundedRectangle, radius: 15, stroke: 2, strokeColor: 0xff38b6ff }, // border: 2px solid var(--accent-blue)
+            shader: { type: Lightning.shaders.RoundedRectangle, radius: 15, stroke: 0, strokeColor: 0x00000000 }, // Sin borde inactivo
             zIndex: 1
-        });
-        this.tag('Header.InfoBtn').patch({
-            color: 0x00000000,
-            Text: { text: { textColor: 0xff38b6ff } }
         });
     }
 

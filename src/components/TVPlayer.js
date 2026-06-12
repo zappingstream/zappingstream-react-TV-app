@@ -24,7 +24,7 @@ export default class TVPlayer extends Lightning.Component {
                     x: 210,
                     y: 30,
                     text: {
-                        text: '‹ Presiona OK para salir',
+                        text: '‹ Presiona Atrás para salir',
                         fontSize: 24,
                         fontFace: 'Bold',
                         textColor: 0xff000000,
@@ -87,15 +87,12 @@ export default class TVPlayer extends Lightning.Component {
         this._iframe.style.zIndex = '0';
         this._iframe.style.border = 'none';
 
-        // Bloqueo total: Evitamos que YouTube pueda robarse el foco nativo 
-        // del teclado o control remoto bajo ninguna circunstancia.
-        this._iframe.style.pointerEvents = 'none';
-        this._iframe.setAttribute('tabindex', '-1');
-
         document.body.appendChild(this._iframe);
 
-        // Evitamos que el autoplay de YouTube le robe el foco a Lightning JS
-        this._lockFocusToApp();
+        // Permitimos que el iframe reciba el foco para poder adelantar/atrasar con el control
+        setTimeout(() => {
+            if (this._iframe) this._iframe.focus();
+        }, 500);
     }
 
     _destroyIframe() {
@@ -104,12 +101,6 @@ export default class TVPlayer extends Lightning.Component {
             this._iframe = null;
         }
         this._clearFocusLock();
-    }
-
-    _lockFocusToApp() {
-        this._clearFocusLock();
-        // Bloqueo constante para asegurar que YouTube JAMÁS tome el control
-        this._focusInterval = setInterval(() => window.focus(), 500);
     }
 
     _clearFocusLock() {
