@@ -131,6 +131,7 @@ export default class InfoModal extends Lightning.Component {
     // Se dispara cuando el usuario aprieta la tecla Atrás/Back
     _handleBack() {
         if (this._onCloseCallback) this._onCloseCallback();
+        return true;
     }
 
     // Efecto visual de "Seleccionado" sobre el botón Volver

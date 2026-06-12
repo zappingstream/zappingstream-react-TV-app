@@ -273,11 +273,4 @@ export default class ChannelCard extends Lightning.Component {
         }
     }
 
-    // Atajo para la funcionalidad "toggleInfo" (Por ej: presionar tecla arriba o alguna otra lógica)
-    // Opcionalmente, podrías asignar la tecla "Menu" o "Espacio" para que dispare esta acción.
-    _handleMenu() {
-        if (this._item.toggleInfo) {
-            this._item.toggleInfo(this._item.channel.ChannelName);
-        }
-    }
 }

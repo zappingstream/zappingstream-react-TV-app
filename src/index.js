@@ -21,18 +21,39 @@ export default function () {
   `
   document.head.appendChild(style)
 
-  // --- TRAMPA UNIVERSAL PARA EL BOTÓN ATRÁS (HISTORY API) ---
-  // Como las teles simulan el botón 'Back' del control usando la navegación
-  // del navegador, empujamos un estado falso para evitar que la app se cierre.
-  window.history.pushState({ noBackExitsApp: true }, '')
-  window.addEventListener('popstate', () => {
-    // Volvemos a empujar el estado para seguir atrapando futuros 'Atrás'
-    window.history.pushState({ noBackExitsApp: true }, '')
-    // Simulamos la tecla Escape para que Lightning la ataje con _handleBack()
+  // --- PUENTE CENTRALIZADO: BOTÓN ATRÁS ---
+  // Esta función emite el evento que tu App.js SÍ está esperando escuchar
+  const fireGoBack = () => {
+    window.dispatchEvent(new CustomEvent('appGoBack'))
+    
+    // Por las dudas, también disparamos el escape tradicional para Lightning
     const escEvent = new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true })
-    // Lightning JS requiere estrictamente la propiedad keyCode (27 = Escape) para detectar el botón
     Object.defineProperty(escEvent, 'keyCode', { get: () => 27 })
     window.dispatchEvent(escEvent)
+  }
+
+  // 1. TRAMPA CAPACITOR (ANDROID TV) - ¡El que evita que la app se cierre nativamente!
+  if (window.Capacitor && window.Capacitor.isNativePlatform() && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    window.Capacitor.Plugins.App.addListener('backButton', () => {
+      fireGoBack()
+    })
+  }
+
+  // 2. TRAMPA TIZEN (SAMSUNG TV)
+  if (window.tizen) {
+    document.addEventListener('tizenhwkey', (e) => {
+      if (e.keyName === 'Back' || e.keyName === 'Return') {
+        e.preventDefault()
+        fireGoBack()
+      }
+    })
+  }
+
+  // --- TRAMPA UNIVERSAL PARA EL BOTÓN ATRÁS (HISTORY API) ---
+  window.history.pushState({ noBackExitsApp: true }, '')
+  window.addEventListener('popstate', () => {
+    window.history.pushState({ noBackExitsApp: true }, '')
+    fireGoBack()
   })
 
   return Launch(App, ...arguments)

@@ -486,4 +486,11 @@ export default class App extends Lightning.Component {
     }
     return this;
   }
+
+  // --- ESCUDO FINAL ---
+  // Si un evento "Atrás" llega hasta la raíz de la app sin ser manejado,
+  // lo absorbemos devolviendo true para evitar que intente cerrar la app o abrir modales.
+  _handleBack() {
+    return true;
+  }
 }

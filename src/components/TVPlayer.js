@@ -36,6 +36,7 @@ export default class TVPlayer extends Lightning.Component {
     _init() {
         this._timer = null;
         this._isClosing = false;
+        this._focusInterval = null;
     }
 
     // Se ejecuta automáticamente cuando el componente se muestra en pantalla
@@ -49,6 +50,7 @@ export default class TVPlayer extends Lightning.Component {
     _inactive() {
         this._destroyIframe();
         this._clearTimer();
+        this._clearFocusLock();
     }
 
     // Setters equivalentes a los Props de React
@@ -92,13 +94,27 @@ export default class TVPlayer extends Lightning.Component {
         document.body.appendChild(this._iframe);
 
         // Evitamos que el autoplay de YouTube le robe el foco a Lightning JS
-        setTimeout(() => window.focus(), 500);
+        this._lockFocusToApp();
     }
 
     _destroyIframe() {
         if (this._iframe && this._iframe.parentNode) {
             this._iframe.parentNode.removeChild(this._iframe);
             this._iframe = null;
+        }
+        this._clearFocusLock();
+    }
+
+    _lockFocusToApp() {
+        this._clearFocusLock();
+        // Bloqueo constante para asegurar que YouTube JAMÁS tome el control
+        this._focusInterval = setInterval(() => window.focus(), 500);
+    }
+
+    _clearFocusLock() {
+        if (this._focusInterval) {
+            clearInterval(this._focusInterval);
+            this._focusInterval = null;
         }
     }
 
