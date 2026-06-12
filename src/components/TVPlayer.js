@@ -81,7 +81,7 @@ export default class TVPlayer extends Lightning.Component {
         this._iframe.style.left = '0';
         this._iframe.style.width = '100vw';
         this._iframe.style.height = '100vh';
-        this._iframe.style.zIndex = '-1';
+        this._iframe.style.zIndex = '0';
         this._iframe.style.border = 'none';
 
         document.body.appendChild(this._iframe);
