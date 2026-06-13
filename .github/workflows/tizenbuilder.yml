@@ -1,0 +1,48 @@
+name: Compilar App Tizen (Samsung TV)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-tizen:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Descargar el código del repositorio
+        uses: actions/checkout@v4
+
+      - name: 2. Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 3. Instalar dependencias base
+        run: npm install
+
+      - name: 4. Compilar Lightning JS
+        run: npx @lightningjs/cli build
+
+      - name: 5. Inyectar config.xml (Manifiesto de Tizen)
+        run: |
+          cd build
+          if [ ! -f config.xml ]; then
+            echo '<?xml version="1.0" encoding="UTF-8"?>
+            <widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="http://zapping.app/ZappingApp" version="1.0.0" viewmodes="maximized">
+                <tizen:application id="ZappingApp.Zapping" package="ZappingApp" required_version="2.3"/>
+                <content src="index.html"/>
+                <feature name="http://tizen.org/feature/screen.size.all"/>
+                <icon src="icon.png"/>
+                <name>Zapping</name>
+            </widget>' > config.xml
+          fi
+
+      - name: 6. Empaquetar la aplicación (.wgt) usando ZIP
+        # Zipeamos todo el contenido de la carpeta build y lo nombramos .wgt
+        working-directory: ./build
+        run: zip -r ../zapping-app.wgt ./*
+
+      - name: 7. Subir el Widget final
+        uses: actions/upload-artifact@v4
+        with:
+          name: zapping-app-tizen
+          path: zapping-app.wgt
