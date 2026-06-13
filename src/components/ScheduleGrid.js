@@ -10,13 +10,13 @@ import { COLORS, BORDER_RADIUS, COMPONENT_SIZE, SPACING, TYPOGRAPHY } from '../c
 class DayButton extends Lightning.Component {
     static _template() {
         return {
-            w: COMPONENT_SIZE.BUTTON_HEIGHT + 110, h: COMPONENT_SIZE.BUTTON_HEIGHT,
+            w: 200, h: 60,
             rect: true,
             color: COLORS.BG_PANEL,
             shader: { type: Lightning.shaders.RoundedRectangle, radius: BORDER_RADIUS.PILL },
             Label: {
-                mount: 0.5, x: (COMPONENT_SIZE.BUTTON_HEIGHT + 110) / 2, y: COMPONENT_SIZE.BUTTON_HEIGHT / 2,
-                text: { text: '', fontSize: TYPOGRAPHY.FONT_SIZE_LARGE, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.TEXT_WHITE }
+                mount: 0.5, x: 100, y: 32,
+                text: { text: '', fontSize: 24, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.TEXT_WHITE }
             }
         };
     }
@@ -68,25 +68,25 @@ class DayButton extends Lightning.Component {
 class EpgEvent extends Lightning.Component {
     static _template() {
         return {
-            w: COMPONENT_SIZE.CARD_WIDTH, h: COMPONENT_SIZE.CARD_HEIGHT,
+            w: 380, h: 400,
             rect: true,
             color: COLORS.BG_DARK,
             shader: { type: Lightning.shaders.RoundedRectangle, radius: BORDER_RADIUS.LARGE },
             TimeBadge: {
-                y: SPACING.PADDING_SMALL, x: SPACING.PADDING_SMALL, h: 28, rect: true, color: COLORS.BG_PANEL,
+                y: 12, x: 12, h: 36, rect: true, color: COLORS.BG_PANEL,
                 shader: { type: Lightning.shaders.RoundedRectangle, radius: BORDER_RADIUS.MEDIUM },
                 Label: {
-                    x: SPACING.PADDING_SMALL * 1.5, mountY: 0.5, y: 16,
-                    text: { text: '', fontSize: TYPOGRAPHY.FONT_SIZE_SMALL, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.TEXT_WHITE }
+                    x: 12, mountY: 0.5, y: 20,
+                    text: { text: '', fontSize: 20, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.TEXT_WHITE }
                 }
             },
             VideoWrapper: {
-                y: 35, w: COMPONENT_SIZE.CARD_WIDTH, h: 120,
+                y: 60, w: 380, h: 214,
                 type: VideoCard
             },
             Title: {
-                y: 160, x: SPACING.PADDING_SMALL, w: COMPONENT_SIZE.CARD_WIDTH - SPACING.PADDING_SMALL * 2,
-                text: { text: '', fontSize: TYPOGRAPHY.FONT_SIZE_NORMAL, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.TEXT_WHITE, maxLines: 2, textOverflow: 'ellipsis', wordWrapWidth: COMPONENT_SIZE.CARD_WIDTH - SPACING.PADDING_SMALL * 2 }
+                y: 290, x: 16, w: 348,
+                text: { text: '', fontSize: 24, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.TEXT_WHITE, maxLines: 3, textOverflow: 'ellipsis', wordWrapWidth: 348, lineHeight: 30 }
             }
         };
     }
@@ -116,7 +116,7 @@ class EpgEvent extends Lightning.Component {
         this.tag('TimeBadge.Label').text.textColor = isNotNow ? COLORS.TEXT_GRAY : COLORS.TEXT_WHITE;
 
         // Ajustar dinámicamente el ancho del badge en base al texto
-        this.tag('TimeBadge').w = Math.max(timeText.length * 8 + 24, 60);
+        this.tag('TimeBadge').w = Math.max(timeText.length * 12 + 30, 80);
 
         const rawImageUrl = ev.ThumbnailUrl || ev.channel.ChannelImgUrl;
 
@@ -163,19 +163,19 @@ class EpgEvent extends Lightning.Component {
 class EpgRow extends Lightning.Component {
     static _template() {
         return {
-            w: 1920, h: 280, // Altura fija de la fila
+            w: 1920, h: 460, // Altura fija de la fila
             Sidebar: {
-                w: 140, h: 260, rect: true, color: COLORS.BG_BLACK,
-                Logo: { x: 30, y: 15, w: COMPONENT_SIZE.LOGO_MEDIUM, h: COMPONENT_SIZE.LOGO_MEDIUM, shader: { type: Lightning.shaders.RoundedRectangle, radius: BORDER_RADIUS.CIRCLE } },
-                Name: { x: 10, y: 105, w: 120, text: { text: '', fontSize: TYPOGRAPHY.FONT_SIZE_SMALL, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.ACCENT_BLUE, wordWrapWidth: 120, maxLines: 2, textAlign: 'center' } },
+                w: 180, h: 440, rect: true, color: COLORS.BG_BLACK,
+                Logo: { x: 50, y: 30, w: COMPONENT_SIZE.LOGO_MEDIUM, h: COMPONENT_SIZE.LOGO_MEDIUM, shader: { type: Lightning.shaders.RoundedRectangle, radius: BORDER_RADIUS.CIRCLE } },
+                Name: { x: 10, y: 130, w: 160, text: { text: '', fontSize: 24, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.ACCENT_BLUE, wordWrapWidth: 160, maxLines: 2, textAlign: 'center', lineHeight: 32 } },
                 InfoBtn: {
-                    x: 30, y: 180, w: 80, h: COMPONENT_SIZE.BUTTON_HEIGHT_SMALL, rect: true, color: COLORS.BG_PANEL, shader: { type: Lightning.shaders.RoundedRectangle, radius: BORDER_RADIUS.PILL },
-                    Label: { mount: 0.5, x: 40, y: COMPONENT_SIZE.BUTTON_HEIGHT_SMALL / 2, text: { text: 'Info', fontSize: TYPOGRAPHY.FONT_SIZE_SMALL, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.TEXT_WHITE } }
+                    x: 30, y: 280, w: 120, h: 54, rect: true, color: COLORS.BG_PANEL, shader: { type: Lightning.shaders.RoundedRectangle, radius: BORDER_RADIUS.PILL },
+                    Label: { mount: 0.5, x: 60, y: 29, text: { text: 'Info', fontSize: 22, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.TEXT_WHITE } }
                 }
             },
             // Slider horizontal de videos
             TrackBounds: {
-                x: 160, y: -10, w: 1760, h: 300, clipping: true,
+                x: 200, y: -10, w: 1720, h: 480, clipping: true,
                 Slider: { x: 0, y: 10, Items: {} }
             }
         };
@@ -205,7 +205,7 @@ class EpgRow extends Lightning.Component {
                 x: currentX,
                 item: { ev, navigateYouTube, onVideoError }
             });
-            currentX += 280; // 240 de ancho + 40 de gap
+            currentX += 400; // 380 de ancho + 20 de gap
         });
 
         this.tag('TrackBounds.Slider.Items').children = items;
@@ -251,7 +251,7 @@ class EpgRow extends Lightning.Component {
             const evIndex = this._index - 1;
             let targetX = 0;
             if (evIndex > 0) {
-                targetX = -(evIndex * 280) + 60; // Desplazar exacto dejando 60px de margen respecto a la columna
+                targetX = -(evIndex * 400) + 60; // Desplazar exacto dejando 60px de margen respecto a la columna
             }
 
             if (instant) {
@@ -260,6 +260,13 @@ class EpgRow extends Lightning.Component {
                 this.tag('TrackBounds.Slider').patch({ smooth: { x: targetX } });
             }
         }
+
+        // PERFORMANCE: Culling horizontal en EpgRow (desconectar de la GPU lo lejano)
+        const safeEvIndex = Math.max(0, this._index - 1);
+        this._events.forEach((ev, idx) => {
+            const distance = Math.abs(idx - safeEvIndex);
+            ev.visible = distance <= 5; // Mostrar solo 5 videos a la izquierda/derecha
+        });
     }
 
     _getFocused() {
@@ -285,19 +292,19 @@ export default class ScheduleGrid extends Lightning.Component {
 
             // Selector de Días Horizontal
             DaysRailBounds: {
-                x: 60, y: 20, w: 1800, h: 70, clipping: true,
+                x: 60, y: 20, w: 1800, h: 80, clipping: true,
                 Slider: { x: 0, y: 0, Items: {} }
             },
 
             // Mensaje de Vacío
             NoEventsMsg: {
                 alpha: 0, mount: 0.5, x: 960, y: 540,
-                text: { text: 'No hay transmisiones programadas para este día.', fontSize: TYPOGRAPHY.FONT_SIZE_XLARGE, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.TEXT_GRAY }
+                text: { text: 'No hay transmisiones programadas para este día.', fontSize: 36, fontFace: TYPOGRAPHY.FONT_FAMILY, textColor: COLORS.TEXT_GRAY }
             },
 
             // Contenedor Vertical de Canales
             EpgContainerBounds: {
-                x: 0, y: 100, w: 1920, h: 830, clipping: true,
+                x: 0, y: 110, w: 1920, h: 820, clipping: true,
                 Slider: { x: 0, y: 0, Items: {} }
             }
         };
@@ -343,7 +350,7 @@ export default class ScheduleGrid extends Lightning.Component {
                 x: currentX,
                 item: { date: d, label }
             });
-            currentX += 172; // 160 de ancho + 12 de gap (estilos CSS .days-rail gap: 12px)
+            currentX += 212; // 200 de ancho + 12 de gap
         });
 
         this.tag('DaysRailBounds.Slider.Items').children = daysItems;
@@ -448,7 +455,7 @@ export default class ScheduleGrid extends Lightning.Component {
                     }
                 }
             });
-            currentY += 280; // Altura de fila
+            currentY += 460; // Altura de fila
         });
 
         this.tag('EpgContainerBounds.Slider.Items').children = rowItems;
@@ -498,7 +505,7 @@ export default class ScheduleGrid extends Lightning.Component {
     _handleLeft() {
         if (this._focusY === 0 && this._dayIndex > 0) {
             this._dayIndex--;
-            this.tag('DaysRailBounds.Slider').patch({ smooth: { x: -(this._dayIndex * 172) + 500 } }); // Ajustado al nuevo gap de 12px
+            this.tag('DaysRailBounds.Slider').patch({ smooth: { x: -(this._dayIndex * 212) + 500 } });
             this._refocus();
             return true;
         }
@@ -508,7 +515,7 @@ export default class ScheduleGrid extends Lightning.Component {
     _handleRight() {
         if (this._focusY === 0 && this._dayIndex < this._dayButtons.length - 1) {
             this._dayIndex++;
-            this.tag('DaysRailBounds.Slider').patch({ smooth: { x: -(this._dayIndex * 172) + 500 } }); // Ajustado al nuevo gap de 12px
+            this.tag('DaysRailBounds.Slider').patch({ smooth: { x: -(this._dayIndex * 212) + 500 } });
             this._refocus();
             return true;
         }
@@ -521,9 +528,20 @@ export default class ScheduleGrid extends Lightning.Component {
             // Desplazar contenedor EPG hacia arriba cuando bajamos de la fila 2
             let targetY = 0;
             if (rowIndex > 1) {
-                targetY = -((rowIndex - 1) * 280); // Altura de fila: 280px
+                targetY = -((rowIndex - 1) * 460); // Altura de fila: 460px
             }
             this.tag('EpgContainerBounds.Slider').patch({ smooth: { y: targetY } });
+
+            // PERFORMANCE: Culling vertical (ocultar filas lejanas)
+            this._rowsComponents.forEach((row, idx) => {
+                const distance = Math.abs(idx - rowIndex);
+                row.visible = distance <= 3; // Mostrar solo 3 filas hacia arriba/abajo
+            });
+        } else {
+            // Si el foco está en el selector de días, renderizamos las primeras filas
+            this._rowsComponents.forEach((row, idx) => {
+                row.visible = idx <= 3;
+            });
         }
     }
 

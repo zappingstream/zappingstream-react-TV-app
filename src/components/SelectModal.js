@@ -9,7 +9,7 @@ class SelectItem extends Lightning.Component {
             shader: { type: Lightning.shaders.RoundedRectangle, radius: BORDER_RADIUS.MEDIUM },
             Label: {
                 x: 30, mountY: 0.5, y: 30,
-                text: { text: '', fontSize: TYPOGRAPHY.FONT_SIZE_LARGE, textColor: COLORS.TEXT_WHITE }
+                text: { text: '', fontSize: TYPOGRAPHY.FONT_SIZE_LARGE, textColor: COLORS.TEXT_WHITE, wordWrapWidth: 540, maxLines: 1, textOverflow: 'ellipsis' }
             }
         };
     }
@@ -107,6 +107,5 @@ export default class SelectModal extends Lightning.Component {
 
     $onOptionSelected(value) {
         if (this._onSelect) this._onSelect(value);
-        this.fireAncestors('$closeSelectModal');
     }
 }

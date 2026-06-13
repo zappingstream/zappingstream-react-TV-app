@@ -117,7 +117,7 @@ export default class App extends Lightning.Component {
 
     // Configurar Modales
     this.tag('Overlays.Info').onClose = () => {
-      this._focusedSection = 'footer';
+      this._focusedSection = this._previousFocus || 'footer';
       this.tag('Overlays.Info').patch({ smooth: { alpha: 0 } });
       this._updateUI();
       this._refocus();
@@ -220,6 +220,7 @@ export default class App extends Lightning.Component {
           channels: this._channels,
           navigateYouTube: (url) => this._openPlayer(url),
           toggleInfo: (channelName) => {
+              this._previousFocus = this._focusedSection;
             this._focusedSection = 'modal';
             this.tag('Overlays.Info').alpha = 1;
           },
@@ -242,6 +243,7 @@ export default class App extends Lightning.Component {
         const callbacks = {
           navigateYouTube: (url) => this._openPlayer(url),
           toggleInfo: (channelName) => {
+              this._previousFocus = this._focusedSection;
             this._focusedSection = 'modal';
             this.tag('Overlays.Info').alpha = 1;
           },
@@ -293,6 +295,7 @@ export default class App extends Lightning.Component {
           this._refocus();
         },
         onSearchClick: () => {
+          this._previousFocus = this._focusedSection;
           this._focusedSection = 'search';
           this.tag('Overlays.Search').alpha = 1;
           this.tag('Overlays.Search').config = {
@@ -302,6 +305,7 @@ export default class App extends Lightning.Component {
           this._refocus();
         },
         onProvinceClick: () => {
+          this._previousFocus = this._focusedSection;
           this._focusedSection = 'select';
           this.tag('Overlays.Select').alpha = 1;
           this.tag('Overlays.Select').config = {
@@ -313,12 +317,14 @@ export default class App extends Lightning.Component {
             onSelect: (prov) => {
               this._selectedProvince = prov;
               this._applyFilters();
+              this.$closeSelectModal();
             }
           };
           this._refocus();
         },
         onCityClick: () => {
           if (!this._citiesList || this._citiesList.length === 0) return;
+          this._previousFocus = this._focusedSection;
           this._focusedSection = 'select';
           this.tag('Overlays.Select').alpha = 1;
           this.tag('Overlays.Select').config = {
@@ -330,6 +336,7 @@ export default class App extends Lightning.Component {
             onSelect: (city) => {
               this._selectedCity = city;
               this._applyFilters();
+              this.$closeSelectModal();
             }
           };
           this._refocus();
@@ -342,6 +349,7 @@ export default class App extends Lightning.Component {
       isRefreshing: this._isLoadingChannels,
       onRefresh: () => this._fetchChannels(),
       onShowInfo: () => {
+        this._previousFocus = this._focusedSection;
         this._focusedSection = 'modal';
         this.tag('Overlays.Info').alpha = 1; // Mostramos el modal
         this._refocus();
@@ -375,7 +383,9 @@ export default class App extends Lightning.Component {
     if (videoId) {
       this._openPlayer(`https://www.youtube.com/watch?v=${videoId}`);
     } else {
-      console.warn("No se encontró VideoId en vivo para reproducir:", channel.ChannelName);
+      // OFFLINE: Redirigimos a la pestaña de transmisiones del canal de YouTube usando su ID exacto
+      const targetUrl = channel.ChannelLiveUrl.replace("/live", "/streams");
+      this._openPlayer(targetUrl);
     }
   }
 
@@ -391,6 +401,9 @@ export default class App extends Lightning.Component {
       this.tag('Main').alpha = 0; // Ocultamos la app detrás del reproductor
       this.tag('Background').alpha = 0;
       this._refocus();
+    } else {
+      // Al no ser un video directo, forzamos abrir una pestaña nueva o la app nativa de YouTube
+      window.open(url, '_blank');
     }
   }
 
@@ -402,10 +415,30 @@ export default class App extends Lightning.Component {
     this._refocus();
   }
 
+  // --- Manejador para seleccionar Stream de un Canal con múltiples activos ---
+  $onSelectStream(data) {
+    const { channel, activeVideos } = data;
+    this._previousFocus = this._focusedSection;
+    this._focusedSection = 'select';
+    this.tag('Overlays.Select').alpha = 1;
+    this.tag('Overlays.Select').config = {
+      title: 'Transmisiones en curso',
+      options: activeVideos.map(v => ({
+        label: (v.IsPremiere ? '⭐ ' : '🔴 ') + (v.Title || channel.ChannelName),
+        value: v.VideoId
+      })),
+      onSelect: (videoId) => {
+        this.tag('Overlays.Select').alpha = 0;
+        this._openPlayer(`https://www.youtube.com/watch?v=${videoId}`);
+      }
+    };
+    this._refocus();
+  }
+
   // --- Manejador para cerrar modal de búsqueda ---
   $closeSearchModal() {
     this.tag('Overlays.Search').alpha = 0;
-    this._focusedSection = 'header';
+    this._focusedSection = this._previousFocus || 'header';
     this._updateUI();
     this._refocus();
   }
@@ -413,7 +446,7 @@ export default class App extends Lightning.Component {
   // --- Manejador para cerrar modal de selector ---
   $closeSelectModal() {
     this.tag('Overlays.Select').alpha = 0;
-    this._focusedSection = 'header';
+    this._focusedSection = this._previousFocus || 'header';
     this._updateUI();
     this._refocus();
   }

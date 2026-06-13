@@ -2,7 +2,8 @@
   "appSettings": {
     "stage": {
       "clearColor": "0x00000000",
-      "useImageWorker": false
+      "useImageWorker": true,
+      "boundsMargin": [200, 200, 200, 200]
     },
     "debug": false
   },

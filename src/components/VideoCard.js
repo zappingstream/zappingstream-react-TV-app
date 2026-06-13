@@ -113,12 +113,14 @@ export default class VideoCard extends Lightning.Component {
             this.tag('Fallback').alpha = 1; // Aseguramos que el fallback se vea mientras carga
             this.tag('Image').alpha = 1; // Restauramos la visibilidad por si se reusa la tarjeta
 
+            // OPTIMIZACIÓN: Pedir miniatura de menor peso (mqdefault 320x180) de YouTube
+            let finalSrc = this._imageUrl.replace(/(maxresdefault|hqdefault|sddefault)\.jpg/i, 'mqdefault.jpg');
+
             // --- SOLUCIÓN DEFINITIVA A CORS EN WEBGL ---
             // WebGL es estricto: si YouTube no envía la cabecera CORS, la textura colapsa.
             // Pasamos las imágenes de Google/YouTube por un Image CDN (wsrv.nl) que fuerza el CORS.
-            let finalSrc = this._imageUrl;
             if (finalSrc.includes('ytimg.com') || finalSrc.includes('youtube.com') || finalSrc.includes('ggpht.com')) {
-                finalSrc = `https://wsrv.nl/?url=${encodeURIComponent(finalSrc)}`;
+                finalSrc = `https://wsrv.nl/?url=${encodeURIComponent(finalSrc)}&w=400&output=webp`;
             }
 
             this.tag('Image').src = finalSrc;

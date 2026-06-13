@@ -63,10 +63,10 @@ export default class ChannelCategoryRow extends Lightning.Component {
 
         const getCardWidth = (channel) => {
             const activeCount = Object.keys(channel.Actives || {}).length;
-            if (activeCount > 1) {
-                return COMPONENT_SIZE.CARD_WIDTH + ((activeCount - 1) * 100);
+            if (title === 'AHORA' && activeCount > 1) {
+                return 380 + ((activeCount - 1) * 355);
             }
-            return COMPONENT_SIZE.CARD_WIDTH;
+            return 380;
         };
 
         channels.forEach(channel => {
@@ -92,6 +92,7 @@ export default class ChannelCategoryRow extends Lightning.Component {
 
         this.tag('Slider.Items').children = items;
         this._cards = this.tag('Slider.Items').children;
+        this._updateScroll(); // Forzar el culling al inicializar la fila
     }
 
     // --- Control de Foco y Navegación Horizontal ---
@@ -123,6 +124,12 @@ export default class ChannelCategoryRow extends Lightning.Component {
                 smooth: { x: targetX }
             });
         }
+
+        // PERFORMANCE: Culling horizontal (desactivar renderizado fuera de pantalla)
+        this._cards.forEach((card, idx) => {
+            const distance = Math.abs(idx - this._index);
+            card.visible = distance <= 5;
+        });
     }
 
     _getFocused() {
